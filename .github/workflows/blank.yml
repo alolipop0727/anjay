@@ -1,0 +1,52 @@
+name: Taliscale
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  rdp:
+    runs-on: windows-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable RDP
+        run: |
+          Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
+          Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" -Name "UserAuthentication" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          
+          # Buat user RDP
+          net user admin Alfa /add
+          net localgroup Administrators admin /add
+          net localgroup "Remote Desktop Users" admin /add
+        shell: powershell
+
+      - name: Install & Connect Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTH_KEY }}
+          tags: tag:ci
+
+      - name: Display Connection Details & Keep Alive
+        run: |
+          $ip = (tailscale ip -4).Trim()
+          Write-Host "=========================================="
+          Write-Host "🔐 RDP VIA TAILSCALE - CONNECT NOW"
+          Write-Host "=========================================="
+          Write-Host "Tailscale IP : $ip"
+          Write-Host "Username     : admin"
+          Write-Host "Password     : Alfa"
+          Write-Host "=========================================="
+          Write-Host "🔥 Session aktif 6 jam"
+          Write-Host "=========================================="
+          
+          # Keep alive 6 jam
+          while ($true) {
+            Start-Sleep -Seconds 3600
+          }
+        shell: powershell
