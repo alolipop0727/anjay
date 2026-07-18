@@ -21,7 +21,7 @@ jobs:
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
           
           # Buat user RDP
-          net user admin Alfa /add
+          net user admin Alfa@123#Manz /add
           net localgroup Administrators admin /add
           net localgroup "Remote Desktop Users" admin /add
         shell: powershell
@@ -40,7 +40,7 @@ jobs:
           Write-Host "=========================================="
           Write-Host "Tailscale IP : $ip"
           Write-Host "Username     : admin"
-          Write-Host "Password     : Alfa"
+          Write-Host "Password     : Alfa@123#Manz"
           Write-Host "=========================================="
           Write-Host "🔥 Session aktif 6 jam"
           Write-Host "=========================================="
